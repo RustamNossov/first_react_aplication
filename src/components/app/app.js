@@ -33,18 +33,20 @@ export default class App extends Component{
         this.state = {
             data: [
                 {label: "Going to learn React?", important: false, like: false, id: generator(), display: true},
-                {label: "That is soo good", important: true, like: false, id: generator(), display: false},
+                {label: "That is soo good", important: true, like: false, id: generator(), display: true},
                 {label: "I nead a break", important: false, like: false, id: generator(), display: true},
                 3
-                ]
+                ],
+            filter: 'all'
         };
         this.deleteItem = this.deleteItem.bind(this);
         this.addItem = this.addItem.bind(this);
         this.onToggle = this.onToggle.bind(this);
         this.onFilter = this.onFilter.bind(this);
-        this.showAllRecords = this.showAllRecords.bind(this);
-        this.onAllLiked = this.onAllLiked.bind(this);
+        // this.showAllRecords = this.showAllRecords.bind(this);
+        // this.onAllLiked = this.onAllLiked.bind(this);
         //this.onToggleLicked = this.onToggleLicked.bind(this);
+        this.onFilterSelect = this.onFilterSelect.bind(this);
 
         this.newId = generator();
         this.newArr = [];
@@ -128,6 +130,13 @@ export default class App extends Component{
         }
     }
 
+    filterPost(items, filter) {
+        if (filter === 'like') {
+            return items.filter(item => item.like)
+        } else {
+            return items 
+        }
+    }
     showAllRecords() {
 
         this.setState(({data})=> {
@@ -145,32 +154,39 @@ export default class App extends Component{
         })  
     }
 
-    onAllLiked() {
-        this.setState(({data})=> {
-            let newData = data.filter(item => typeof item === 'object')
-            newData = newData.map(item => {
-                if (item.like === true) {
-                    item.display = true
-                } else {
-                    item.display = false
-                }
-                return item
-            })
+    // onAllLiked() {
+    //     this.setState(({data})=> {
+    //         let newData = data.filter(item => typeof item === 'object')
+    //         newData = newData.map(item => {
+    //             if (item.like === true) {
+    //                 item.display = true
+    //             } else {
+    //                 item.display = false
+    //             }
+    //             return item
+    //         })
 
-            return {
-                data: newData
-            }            
-        })
+    //         return {
+    //             data: newData
+    //         }            
+    //     })
 
+
+    // }
+
+    onFilterSelect(filter) {
+        this.setState({filter}) //        this.setState({filter : filter})
 
     }
     
     render() {
         
-        const {data} = this.state;
+        const {data, filter} = this.state;
     
         const liked = data.filter(item => item.like===true && typeof item === 'object').length;
         const allPosts = data.filter(item => typeof item === 'object').length;
+
+        const visiblePosts = this.filterPost(this.state.data, filter);
         
    
         return (
@@ -183,12 +199,12 @@ export default class App extends Component{
                         onFilter={this.onFilter}
                         />
                     <PorstStatusFilter
-                        onAllRecords={this.showAllRecords}
-                        onAllLiked={this.onAllLiked}
+                        filter={filter}
+                        onFilterSelect={this.onFilterSelect}
                         />
                 </div>
                 <PostList 
-                    posts={this.state.data}
+                    posts={visiblePosts}
                     onDeletePr={this.deleteItem} 
                     onToggle={this.onToggle}
                     
